@@ -2,53 +2,58 @@
 import { useState, FormEvent } from "react";
 
 interface HarvardInfo {
-    totalrecordsperquery: number;
-    totalrecords: number;
-    pages: number;
-    page: number;
-    next: string;
-    prev: string;
-    responsetime: string;
-  }
-  
-  interface HarvardAggregations {
-    [key: string]: unknown;
-  }
-  
-  interface HarvardRecord {
-    id: number;
-    title?: string;
-    [key: string]: unknown;
-  }
+  totalrecordsperquery: number;
+  totalrecords: number;
+  pages: number;
+  page: number;
+  next: string;
+  prev: string;
+  responsetime: string;
+}
 
-  interface HarvardAPIResponse {
-    info?: HarvardInfo;
-    records?: HarvardRecord[];
-    aggregations?: HarvardAggregations;
-    error?: string;
-  }
+interface HarvardAggregations {
+  [key: string]: unknown;
+}
+
+interface HarvardRecord {
+  id: number;
+  title?: string;
+  [key: string]: unknown;
+}
+
+interface HarvardAPIResponse {
+  info?: HarvardInfo;
+  records?: HarvardRecord[];
+  aggregations?: HarvardAggregations;
+  error?: string;
+}
 
 export default function HarvardPage() {
-  const [resource, setResource] = useState("object");
-  const [page, setPage] = useState("1");
-  const [size, setSize] = useState("10");
+  const [resource, setResource] = useState<string>("object");
+  const [page, setPage] = useState<string>("1");
+  const [size, setSize] = useState<string>("10");
   const [data, setData] = useState<HarvardAPIResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
 
-  async function handleSubmit(e: FormEvent) {
+  async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
     setError(null);
 
     try {
-      const res=await fetch(`/api/harvard?resource=${resource}&page=${page}&size=${size}`);
-      const json=await res.json();
-
-      if (json.error) throw new Error(json.error);
+      const res = await fetch(`/api/harvard?resource=${resource}&page=${page}&size=${size}`);
+      const json: HarvardAPIResponse = await res.json();
+      if (json.error) {
+        throw new Error(json.error);
+      }
       setData(json);
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError("An unknown error occurred");
+      }
       setData(null);
     } finally {
       setLoading(false);
@@ -105,7 +110,7 @@ export default function HarvardPage() {
           <h2 className="text-xl font-semibold">Results</h2>
           {data.records ? (
             <ul className="list-disc list-inside space-y-1">
-              {data.records.map((record: any) => (
+              {data.records.map((record) => (
                 <li key={record.id}>
                   {record.title ? record.title : "No Title"} (ID: {record.id})
                 </li>
