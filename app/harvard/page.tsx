@@ -1,13 +1,40 @@
 "use client";
 import { useState, FormEvent } from "react";
 
+interface HarvardInfo {
+    totalrecordsperquery: number;
+    totalrecords: number;
+    pages: number;
+    page: number;
+    next: string;
+    prev: string;
+    responsetime: string;
+  }
+  
+  interface HarvardAggregations {
+    [key: string]: unknown;
+  }
+  
+  interface HarvardRecord {
+    id: number;
+    title?: string;
+    [key: string]: unknown;
+  }
+
+  interface HarvardAPIResponse {
+    info?: HarvardInfo;
+    records?: HarvardRecord[];
+    aggregations?: HarvardAggregations;
+    error?: string;
+  }
+
 export default function HarvardPage() {
-  const [resource, setResource]=useState("object");
-  const [page, setPage]=useState("1");
-  const [size, setSize]= useState("10");
-  const [data, setData]=useState<any>(null);
-  const [error, setError]=useState<string | null>(null);
-  const [loading, setLoading]=useState<boolean>(false);
+  const [resource, setResource] = useState("object");
+  const [page, setPage] = useState("1");
+  const [size, setSize] = useState("10");
+  const [data, setData] = useState<HarvardAPIResponse | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
